@@ -1,17 +1,17 @@
 import * as d3 from 'd3';
 
 /*
- * Simple Demo Chart
+ * Simple Bars Chart
  */
 export default function () {
-  // Link Demo to the helper object in helper.js
-  const Demo = {};
+  // Link Bars to the helper object in helper.js
+  const Bars = {};
 
-  Demo.config = function config() {
+  Bars.config = function config() {
     const vm = this;
 
     vm.margin = {
-      top: 20, right: 20, bottom: 30, left: 80,
+      top: 20, right: 20, bottom: 30, left: 40,
     };
     vm.width = 960 - vm.margin.left - vm.margin.right;
     vm.height = 500 - vm.margin.top - vm.margin.bottom;
@@ -19,7 +19,7 @@ export default function () {
     vm.scales();
   };
 
-  Demo.scales = function scales() {
+  Bars.scales = function scales() {
     const vm = this;
 
     vm.x = d3.scaleBand()
@@ -30,12 +30,12 @@ export default function () {
       .range([vm.height, 0]);
   };
 
-  Demo.chart = function chart() {
+  Bars.chart = function chart() {
     const vm = this;
     // append the svg object to the body of the page
     // append a 'group' element to 'svg'
     // moves the 'group' element to the top left margin
-    const svg = d3.select('#chart').append('svg')
+    const svg = d3.select('body').append('svg')
       .attr('width', vm.width + vm.margin.left + vm.margin.right)
       .attr('height', vm.height + vm.margin.top + vm.margin.bottom)
       .append('g')
@@ -45,7 +45,7 @@ export default function () {
   };
 
   // User called
-  Demo.data = function data(dat) {
+  Bars.data = function data(dat) {
     const vm = this;
     // format the data
     dat.forEach((d) => {
@@ -61,7 +61,7 @@ export default function () {
     return vm;
   };
 
-  Demo.draw = function draw() {
+  Bars.draw = function draw() {
     const vm = this;
     // append the rectangles for the bar chart
     const svg = vm.chart();
@@ -73,14 +73,7 @@ export default function () {
       .attr('x', d => vm.x(d.x))
       .attr('width', vm.x.bandwidth())
       .attr('y', d => vm.y(d.y))
-      .attr('height', d => vm.height - vm.y(d.y))
-    
-    svg.selectAll('.data-labels')
-      .data(vm._data)
-      .enter().append('text')
-      .attr('x', d => vm.x(d.x) + vm.x.bandwidth() / 2)
-      .attr('y', d => vm.y(d.y + 5))
-      .text(d => d.y);
+      .attr('height', d => vm.height - vm.y(d.y));
 
     // add the x Axis
     svg.append('g')
@@ -94,7 +87,7 @@ export default function () {
     return vm;
   };
 
-  Demo.config();
+  Bars.config();
 
-  return Demo;
+  return Bars;
 }
