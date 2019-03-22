@@ -11,10 +11,11 @@ export default function () {
     const vm = this;
 
     vm.margin = {
-      top: 20, right: 20, bottom: 30, left: 80,
+      top: 40, right: 20, bottom: 150, left: 80,
     };
     vm.width = 960 - vm.margin.left - vm.margin.right;
-    vm.height = 500 - vm.margin.top - vm.margin.bottom;
+    vm.height = 700 - vm.margin.top - vm.margin.bottom;
+    vm.target = 'chart';
 
     vm.scales();
   };
@@ -35,7 +36,7 @@ export default function () {
     // append the svg object to the body of the page
     // append a 'group' element to 'svg'
     // moves the 'group' element to the top left margin
-    const svg = d3.select('#chart').append('svg')
+    const svg = d3.select(`#${vm.target}`).append('svg')
       .attr('width', vm.width + vm.margin.left + vm.margin.right)
       .attr('height', vm.height + vm.margin.top + vm.margin.bottom)
       .append('g')
@@ -45,6 +46,12 @@ export default function () {
   };
 
   // User called
+  Demo.id = function id(target) {
+    const vm = this;
+    vm.target = target;
+    return vm;
+  };
+
   Demo.data = function data(dat) {
     const vm = this;
     // format the data
@@ -85,7 +92,12 @@ export default function () {
     // add the x Axis
     svg.append('g')
       .attr('transform', `translate(0,${vm.height})`)
-      .call(d3.axisBottom(vm.x));
+      .call(d3.axisBottom(vm.x))
+      .selectAll('text')	
+      .style('text-anchor', 'end')
+      .attr('dx', '-.8em')
+      .attr('dy', '.15em')
+      .attr('transform', 'rotate(-65)');
 
     // add the y Axis
     svg.append('g')
