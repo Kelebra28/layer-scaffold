@@ -36,6 +36,7 @@ export default function () {
     // append the svg object to the body of the page
     // append a 'group' element to 'svg'
     // moves the 'group' element to the top left margin
+    d3.select(`#${vm.target} svg`).remove();
     const svg = d3.select(`#${vm.target}`).append('svg')
       .attr('width', vm.width + vm.margin.left + vm.margin.right)
       .attr('height', vm.height + vm.margin.top + vm.margin.bottom)
@@ -80,8 +81,8 @@ export default function () {
       .attr('x', d => vm.x(d.x))
       .attr('width', vm.x.bandwidth())
       .attr('y', d => vm.y(d.y))
-      .attr('height', d => vm.height - vm.y(d.y))
-    
+      .attr('height', d => vm.height - vm.y(d.y));
+
     svg.selectAll('.data-labels')
       .data(vm._data)
       .enter().append('text')
@@ -93,7 +94,7 @@ export default function () {
     svg.append('g')
       .attr('transform', `translate(0,${vm.height})`)
       .call(d3.axisBottom(vm.x))
-      .selectAll('text')	
+      .selectAll('text')
       .style('text-anchor', 'end')
       .attr('dx', '-.8em')
       .attr('dy', '.15em')
