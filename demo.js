@@ -16,6 +16,7 @@ export default function () {
     vm.width = 960 - vm.margin.left - vm.margin.right;
     vm.height = 700 - vm.margin.top - vm.margin.bottom;
     vm.target = 'chart';
+    vm.colorScale = [];
 
     vm.scales();
   };
@@ -69,10 +70,24 @@ export default function () {
     return vm;
   };
 
+  /**
+   * array of values used
+   * @param {array or scale} columnName
+   */
+  Demo.colors = function (colors) {
+    const vm = this;
+    if (Array.isArray(colors)) {
+      // Using an array of colors for the range
+      vm.colorScale = colors;
+    }
+    return vm;
+  };
+
   Demo.draw = function draw() {
     const vm = this;
     // append the rectangles for the bar chart
     const svg = vm.chart();
+    const scaleLength = vm.colorScale.length;
 
     svg.selectAll('.bar')
       .data(vm._data)
@@ -81,13 +96,14 @@ export default function () {
       .attr('x', d => vm.x(d.x))
       .attr('width', vm.x.bandwidth())
       .attr('y', d => vm.y(d.y))
-      .attr('height', d => vm.height - vm.y(d.y));
+      .attr('height', d => vm.height - vm.y(d.y))
+      .attr('fill', (d, i) => vm.colorScale[i % scaleLength]);
 
     svg.selectAll('.data-labels')
       .data(vm._data)
       .enter().append('text')
       .attr('x', d => vm.x(d.x) + vm.x.bandwidth() / 2)
-      .attr('y', d => vm.y(d.y + 5))
+      .attr('y', d => vm.y(d.y) - 5)
       .text(d => d.y);
 
     // add the x Axis
