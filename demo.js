@@ -10,13 +10,18 @@ export default function () {
   Demo.config = function config() {
     const vm = this;
 
+    vm.target = 'chart';
     vm.margin = {
       top: 40, right: 20, bottom: 150, left: 80,
     };
-    vm.width = 960 - vm.margin.left - vm.margin.right;
-    vm.height = 700 - vm.margin.top - vm.margin.bottom;
-    vm.target = 'chart';
-    vm.colorScale = [];
+    vm.colorScale = ['#003f5c', '#374c80', '#7a5195', '#bc5090', '#ef5675', '#ff764a', '#ffa600'];
+    const defaultChartSize = {
+      width: 500 - vm.margin.left - vm.margin.right,
+      height: 500 - vm.margin.top - vm.margin.bottom,
+    };
+
+    vm.width = vm.configSize ? vm.configSize.width : defaultChartSize.width;
+    vm.height = vm.configSize ? vm.configSize.height : defaultChartSize.height;
 
     vm.scales();
   };
@@ -80,6 +85,12 @@ export default function () {
       // Using an array of colors for the range
       vm.colorScale = colors;
     }
+    return vm;
+  };
+
+  Demo.setChartSize = function (configSize) {
+    const vm = this;
+    vm.configSize = configSize;
     return vm;
   };
 
