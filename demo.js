@@ -14,7 +14,7 @@ export default function () {
     vm.margin = {
       top: 40, right: 20, bottom: 150, left: 80,
     };
-    vm.colorScale = ['#003f5c', '#374c80', '#7a5195', '#bc5090', '#ef5675', '#ff764a', '#ffa600'];
+    vm.colorsConfig = {};
     const defaultChartSize = {
       width: 500 - vm.margin.left - vm.margin.right,
       height: 500 - vm.margin.top - vm.margin.bottom,
@@ -61,17 +61,45 @@ export default function () {
 
   Demo.data = function data(dat) {
     const vm = this;
+    const yValues = [];
     // format the data
     dat.forEach((d) => {
       d.y = +d.y;
+      yValues.push(d.y);
     });
-
     vm._data = dat;
-
     // Scale the range of the data in the domains
     vm.x.domain(dat.map(d => d.x));
     vm.y.domain([0, d3.max(dat, d => d.y)]);
+    vm.max_y = d3.max(yValues);
+    vm.min_y = d3.min(yValues);
+    return vm;
+  };
 
+  Demo.sortData = function sortData(sortBy) {
+    const vm = this;
+    switch (sortBy) {
+      case 'alphab': // Alphabetical
+        vm._data = _.sortBy(vm._data, [function (o) { return o.x; }]);
+        vm.x.domain(vm._data.map(d => d.x));
+        vm.y.domain([0, d3.max(vm._data, d => d.y)]);
+        break;
+      case 'asc': // Ascending
+        vm._data = _.orderBy(vm._data, ['y'], ['asc']);
+        vm.x.domain(vm._data.map(d => d.x));
+        vm.y.domain([0, d3.max(vm._data, d => d.y)]);
+        break;
+      case 'desc': // Descending
+        vm._data = _.orderBy(vm._data, ['y'], ['desc']);
+        vm.x.domain(vm._data.map(d => d.x));
+        vm.y.domain([0, d3.max(vm._data, d => d.y)]);
+        break;
+      default: // Ascending
+        vm._data = _.orderBy(vm._data, ['y'], ['asc']);
+        vm.x.domain(vm._data.map(d => d.x));
+        vm.y.domain([0, d3.max(vm._data, d => d.y)]);
+        break;
+    }
     return vm;
   };
 
@@ -81,9 +109,17 @@ export default function () {
    */
   Demo.colors = function (colors) {
     const vm = this;
-    if (Array.isArray(colors)) {
+    if (!colors) {
+      vm.colorsConfig.array = ['#003f5c', '#374c80', '#7a5195', '#bc5090', '#ef5675', '#ff764a', '#ffa600'];
+    } else if (Array.isArray(colors) && colors.length > 2) {
       // Using an array of colors for the range
-      vm.colorScale = colors;
+      vm.colorsConfig.array = colors;
+    } else {
+      // Using a preconfigured d3.scale
+      vm.colorsConfig.scale = d3.scaleLinear()
+        .domain([vm.min_y, vm.max_y])
+        .range([colors[0], colors[1]])
+        .interpolate(d3.interpolateHcl); // interpolateHsl interpolateHcl interpolateRgb
     }
     return vm;
   };
@@ -98,7 +134,6 @@ export default function () {
     const vm = this;
     // append the rectangles for the bar chart
     const svg = vm.chart();
-    const scaleLength = vm.colorScale.length;
 
     svg.selectAll('.bar')
       .data(vm._data)
@@ -108,7 +143,15 @@ export default function () {
       .attr('width', vm.x.bandwidth())
       .attr('y', d => vm.y(d.y))
       .attr('height', d => vm.height - vm.y(d.y))
-      .attr('fill', (d, i) => vm.colorScale[i % scaleLength]);
+      // .attr('fill', d => vm.colorsConfig.scale(d.x));
+      .attr('fill', (d, i) => {
+        if (vm.colorsConfig.hasOwnProperty('array')) {
+          const scaleLength = vm.colorsConfig.array.length;
+          return vm.colorsConfig.array[i % scaleLength];
+        } if (vm.colorsConfig.hasOwnProperty('scale')) {
+          return vm.colorsConfig.scale(d.y);
+        }
+      });
 
     svg.selectAll('.data-labels')
       .data(vm._data)
