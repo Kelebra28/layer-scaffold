@@ -12,12 +12,12 @@ export default function () {
 
     vm.target = 'chart';
     vm.margin = {
-      top: 40, right: 20, bottom: 150, left: 80,
+      top: 40, right: 20, bottom: 150, left: 40,
     };
     vm.colorsConfig = {};
     const defaultChartSize = {
-      width: 500 - vm.margin.left - vm.margin.right,
-      height: 500 - vm.margin.top - vm.margin.bottom,
+      width: vm.viewportWidth ? vm.viewportWidth : 430 - vm.margin.left - vm.margin.right,
+      height: vm.viewportHeight ? vm.viewportHeight : 500 - vm.margin.top - vm.margin.bottom,
     };
 
     vm.width = vm.configSize ? vm.configSize.width : defaultChartSize.width;
@@ -56,6 +56,8 @@ export default function () {
   Demo.id = function id(target) {
     const vm = this;
     vm.target = target;
+    vm.viewportWidth = d3.select(`#${vm.target}`).style('width');
+    vm.viewportHeight = d3.select(`#${vm.target}`).style('height');
     return vm;
   };
 
@@ -73,6 +75,7 @@ export default function () {
     vm.y.domain([0, d3.max(dat, d => d.y)]);
     vm.max_y = d3.max(yValues);
     vm.min_y = d3.min(yValues);
+    vm.median_y = d3.median(yValues);
     return vm;
   };
 
@@ -111,22 +114,20 @@ export default function () {
     const vm = this;
     if (!colors) {
       vm.colorsConfig.array = ['#003f5c', '#374c80', '#7a5195', '#bc5090', '#ef5675', '#ff764a', '#ffa600'];
-    } else if (Array.isArray(colors) && colors.length > 2) {
+    } else if (Array.isArray(colors)) {
       // Using an array of colors for the range
       vm.colorsConfig.array = colors;
     } else {
       // Using a preconfigured d3.scale
-      vm.colorsConfig.scale = d3.scaleLinear()
-        .domain([vm.min_y, vm.max_y])
-        .range([colors[0], colors[1]])
-        .interpolate(d3.interpolateHcl); // interpolateHsl interpolateHcl interpolateRgb
+      vm.colorsConfig.scale = colors;
     }
     return vm;
   };
 
   Demo.setChartSize = function (configSize) {
     const vm = this;
-    vm.configSize = configSize;
+    vm.viewportWidth = configSize.width;
+    vm.view;
     return vm;
   };
 
