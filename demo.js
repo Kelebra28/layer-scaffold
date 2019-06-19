@@ -1,4 +1,5 @@
 import * as d3 from 'd3';
+import * as _ from 'lodash';
 
 /*
  * Simple Demo Chart
@@ -9,7 +10,6 @@ export default function () {
 
   Demo.config = function config() {
     const vm = this;
-
     vm.target = 'chart';
     vm.margin = {
       top: 40, right: 20, bottom: 150, left: 40,
@@ -22,7 +22,6 @@ export default function () {
 
     vm.width = vm.configSize ? vm.configSize.width : defaultChartSize.width;
     vm.height = vm.configSize ? vm.configSize.height : defaultChartSize.height;
-
     vm.scales();
   };
 
@@ -56,8 +55,10 @@ export default function () {
   Demo.id = function id(target) {
     const vm = this;
     vm.target = target;
-    vm.viewportWidth = d3.select(`#${vm.target}`).style('width');
-    vm.viewportHeight = d3.select(`#${vm.target}`).style('height');
+    //vm.viewportWidth = d3.select(`#${vm.target}`).style('width');
+    //vm.viewportHeight = d3.select(`#${vm.target}`).style('height');
+    vm.viewportWidth = !d3.select(`#${vm.target}`).empty() ? d3.select(`#${vm.target}`).style('width') : null ;
+    vm.viewportHeight = !d3.select(`#${vm.target}`).empty() ? d3.select(`#${vm.target}`).style('height') : null;
     return vm;
   };
 
@@ -127,7 +128,7 @@ export default function () {
   Demo.setChartSize = function (configSize) {
     const vm = this;
     vm.viewportWidth = configSize.width;
-    vm.view;
+    vm.viewportHeight = configSize.height;
     return vm;
   };
 
