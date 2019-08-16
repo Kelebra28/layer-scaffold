@@ -31,7 +31,6 @@ export default function () {
     vm.x = d3.scaleBand()
       .range([0, vm.width])
       .padding(0.1);
-
     vm.y = d3.scaleLinear()
       .range([vm.height, 0]);
   };
@@ -47,7 +46,6 @@ export default function () {
       .attr('height', vm.height + vm.margin.top + vm.margin.bottom)
       .append('g')
       .attr('transform', `translate(${vm.margin.left}, ${vm.margin.top})`);
-
     return svg;
   };
 
@@ -132,6 +130,15 @@ export default function () {
     return vm;
   };
 
+  /** Set margins */
+  Demo.setMargins = function setMargins(margin) {
+    const vm = this;
+    vm.margin = {
+      top: margin.top, right: margin.right, bottom: margin.bottom, left: margin.left,
+    };
+    return vm;
+  }
+
   Demo.draw = function draw() {
     const vm = this;
     // append the rectangles for the bar chart
@@ -158,15 +165,18 @@ export default function () {
     svg.selectAll('.data-labels')
       .data(vm._data)
       .enter().append('text')
+      .attr('class', 'data-text')
       .attr('x', d => vm.x(d.x) + vm.x.bandwidth() / 2)
       .attr('y', d => vm.y(d.y) - 5)
       .text(d => d.y);
 
     // add the x Axis
     svg.append('g')
+      .attr('class', 'xaxis')
       .attr('transform', `translate(0,${vm.height})`)
       .call(d3.axisBottom(vm.x))
       .selectAll('text')
+      .attr('class', 'xaxis-tick')
       .style('text-anchor', 'end')
       .attr('dx', '-.8em')
       .attr('dy', '.15em')
@@ -174,6 +184,7 @@ export default function () {
 
     // add the y Axis
     svg.append('g')
+      .attr('class', 'yaxis')
       .call(d3.axisLeft(vm.y));
 
     return vm;
